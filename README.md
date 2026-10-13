@@ -56,3 +56,4 @@ Open **http://localhost:5000**
 
 AllergyLens is an informational tool only. It does not guarantee food safety, cannot detect cross-contact contamination, and is not a substitute for medical advice. Always read physical labels.
 "# AllergyLens" 
+"# AllergyLens" 
