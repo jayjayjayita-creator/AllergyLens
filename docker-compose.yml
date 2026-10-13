@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - allergylens_data:/app/data
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_PATH=/app/data/allergylens.db
+      - UPLOAD_FOLDER=/app/uploads
+      - TESSERACT_CMD=/usr/bin/tesseract
+      - SECRET_KEY=change-this-in-production-use-a-long-random-string
+    restart: unless-stopped
+
+volumes:
+  allergylens_data:
+    driver: local

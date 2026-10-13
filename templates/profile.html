@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}My Allergy Profile – AllergyLens{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="section-container">
+    <h1>My Allergy Profile</h1>
+    <p>Select the allergens you need to avoid. This profile will be used for all scans.</p>
+  </div>
+</div>
+
+<div class="section-container">
+  <form method="POST" action="{{ url_for('profile') }}" class="profile-form card">
+    <div class="form-group">
+      <label for="profileName" class="form-label">Profile Name</label>
+      <input
+        type="text"
+        id="profileName"
+        name="name"
+        class="form-input"
+        value="{{ profile.name }}"
+        maxlength="80"
+        placeholder="e.g. My Profile, Child's Profile..."
+      />
+    </div>
+
+    <fieldset class="allergen-fieldset">
+      <legend class="form-label">Select Allergens to Avoid</legend>
+      <div class="allergen-grid">
+        {% set allergen_meta = [
+          ('milk',      '🥛', 'Milk & Dairy',   'Includes casein, whey, lactulose, butter, cream, cheese, yogurt'),
+          ('peanuts',   '🥜', 'Peanuts',         'Includes groundnuts, arachis oil, peanut butter/flour'),
+          ('tree nuts', '🌰', 'Tree Nuts',       'Almonds, cashews, walnuts, pecans, pistachios, hazelnuts, coconut and more'),
+          ('eggs',      '🥚', 'Eggs',            'Includes albumin, ovalbumin, ovomucoid, mayonnaise, meringue'),
+          ('soy',       '🫘', 'Soy',             'Includes tofu, miso, tempeh, edamame, soy lecithin, TVP'),
+          ('wheat',     '🌾', 'Wheat',           'Includes gluten, semolina, spelt, kamut, bulgur, farro'),
+          ('fish',      '🐟', 'Fish',            'Includes specific species, fish sauce, worcestershire, caesar dressing'),
+          ('shellfish', '🦐', 'Shellfish',       'Shrimp, lobster, crab, scallop, clam, oyster, mussel and more'),
+          ('sesame',    '🫙', 'Sesame',          'Includes tahini, til, gingelly oil, sesame paste')
+        ] %}
+
+        {% for key, icon, label, desc in allergen_meta %}
+        <label class="allergen-card {% if key in profile.allergens %}selected{% endif %}" for="allergen_{{ key }}">
+          <input
+            type="checkbox"
+            id="allergen_{{ key }}"
+            name="allergens"
+            value="{{ key }}"
+            {% if key in profile.allergens %}checked{% endif %}
+            class="allergen-check"
+          />
+          <span class="allergen-icon">{{ icon }}</span>
+          <span class="allergen-name">{{ label }}</span>
+          <span class="allergen-desc">{{ desc }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Profile</button>
+      <button type="button" class="btn btn-ghost" id="clearAll">Clear All</button>
+      <button type="button" class="btn btn-ghost" id="selectAll">Select All</button>
+    </div>
+  </form>
+
+  <div class="info-box info-box-teal mt-4">
+    <strong>Tip:</strong> You can update your profile any time. Only allergens you select here will be checked during scans.
+    If your profile is empty, scans will return a warning.
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+  // Visual toggle for allergen cards
+  document.querySelectorAll('.allergen-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      cb.closest('.allergen-card').classList.toggle('selected', cb.checked);
+    });
+  });
+
+  document.getElementById('clearAll').addEventListener('click', () => {
+    document.querySelectorAll('.allergen-check').forEach(cb => {
+      cb.checked = false;
+      cb.closest('.allergen-card').classList.remove('selected');
+    });
+  });
+
+  document.getElementById('selectAll').addEventListener('click', () => {
+    document.querySelectorAll('.allergen-check').forEach(cb => {
+      cb.checked = true;
+      cb.closest('.allergen-card').classList.add('selected');
+    });
+  });
+</script>
+{% endblock %}

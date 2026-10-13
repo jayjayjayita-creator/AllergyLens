@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Scan Label – AllergyLens{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="section-container">
+    <h1>Scan Ingredient Label</h1>
+    <p>Upload a photo of the label or type the ingredients manually.</p>
+    {% if not profile.allergens %}
+      <div class="alert alert-warning" style="margin-top:1rem;">
+        ⚠️ Your allergy profile is empty.
+        <a href="{{ url_for('profile') }}">Set up your profile</a> to enable allergen checking.
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="section-container scan-layout">
+
+  <!-- Input Panel -->
+  <div class="card scan-input-card">
+    <!-- Tab switcher -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="upload">📷 Upload Image</button>
+      <button class="tab-btn" data-tab="manual">✏️ Manual Entry</button>
+    </div>
+
+    <!-- Upload tab -->
+    <div class="tab-panel active" id="tab-upload">
+      <div class="upload-zone" id="uploadZone" role="button" tabindex="0"
+           aria-label="Click or drag to upload an image">
+        <div class="upload-icon">📁</div>
+        <p class="upload-hint">Drag &amp; drop or click to select</p>
+        <p class="upload-sub">JPG or PNG · max 10 MB</p>
+        <input type="file" id="imageInput" accept=".jpg,.jpeg,.png" class="upload-file-input" />
+      </div>
+      <div class="image-preview-container hidden" id="previewContainer">
+        <img id="imagePreview" src="" alt="Uploaded label preview" class="image-preview" />
+        <button class="btn btn-ghost btn-sm" id="clearImage">Remove image</button>
+      </div>
+      <div class="ocr-status hidden" id="ocrStatus">
+        <div class="spinner" aria-label="Processing…"></div>
+        <span>Extracting text with OCR…</span>
+      </div>
+      <div class="ocr-confidence hidden" id="ocrConfidenceBadge"></div>
+    </div>
+
+    <!-- Manual tab -->
+    <div class="tab-panel hidden" id="tab-manual">
+      <label for="manualText" class="form-label">Paste or type ingredient text</label>
+      <textarea
+        id="manualText"
+        class="form-textarea"
+        rows="6"
+        placeholder="e.g. Wheat flour, sugar, cocoa butter, milk solids, soy lecithin (E322), vanilla extract…"
+      ></textarea>
+    </div>
+
+    <!-- Shared editable extracted text -->
+    <div class="extracted-section" id="extractedSection">
+      <label for="ingredientText" class="form-label">
+        Ingredient Text
+        <span class="label-hint" id="editHint">(edit if OCR made mistakes)</span>
+      </label>
+      <textarea id="ingredientText" class="form-textarea" rows="6"
+        placeholder="Extracted or entered ingredients will appear here…"></textarea>
+    </div>
+
+    <!-- Profile allergens summary -->
+    <div class="profile-summary">
+      <span class="profile-summary-label">Checking for:</span>
+      {% if profile.allergens %}
+        {% for a in profile.allergens %}
+          <span class="chip chip-sm chip-{{ a | replace(' ', '') }}">{{ a }}</span>
+        {% endfor %}
+        <a href="{{ url_for('profile') }}" class="link-small">Edit</a>
+      {% else %}
+        <span class="text-muted">None selected — <a href="{{ url_for('profile') }}">add allergens</a></span>
+      {% endif %}
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" id="checkBtn" {% if not profile.allergens %}disabled{% endif %}>
+        🔍 Check Ingredients
+      </button>
+      <button class="btn btn-ghost" id="clearScan">Clear</button>
+    </div>
+  </div>
+
+  <!-- Results Panel -->
+  <div class="card scan-results-card hidden" id="resultsCard">
+    <h2 class="results-title">Scan Results</h2>
+
+    <!-- Quality warning -->
+    <div class="quality-warning hidden" id="qualityWarning">
+      <div class="alert alert-warning" id="qualityWarningText"></div>
+    </div>
+
+    <!-- Allergen matches -->
+    <div id="allergensFound" class="hidden">
+      <div class="result-danger">
+        <h3>🚨 Allergens Detected</h3>
+        <div id="allergenList" class="allergen-results-list"></div>
+      </div>
+    </div>
+
+    <!-- No matches -->
+    <div id="noAllergensFound" class="hidden">
+      <div class="result-success">
+        <h3>✅ No Matching Allergens Found</h3>
+        <p>None of your selected allergens were found in the ingredient text.</p>
+        <p class="result-caveat">This does <strong>not</strong> mean the product is safe. Verify with the physical label.</p>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="result-disclaimer" id="resultDisclaimer"></div>
+
+    <!-- Save status -->
+    <p class="save-note" id="saveNote">✓ Saved to history</p>
+  </div>
+
+</div>
+
+<script>
+  // Pass profile allergens to JS
+  const PROFILE_ALLERGENS = {{ profile.allergens | tojson }};
+</script>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/scan.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Compare Labels – AllergyLens{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="section-container">
+    <h1>Compare Ingredient Labels</h1>
+    <p>Paste two ingredient lists to see what changed and check for new allergens.</p>
+  </div>
+</div>
+
+<div class="section-container">
+  <div class="card">
+    <div class="compare-inputs">
+      <div class="compare-col">
+        <label for="text1" class="form-label">Original Label</label>
+        <textarea id="text1" class="form-textarea" rows="8"
+          placeholder="Paste original ingredient list here…"></textarea>
+      </div>
+      <div class="compare-divider" aria-hidden="true">VS</div>
+      <div class="compare-col">
+        <label for="text2" class="form-label">Updated Label</label>
+        <textarea id="text2" class="form-textarea" rows="8"
+          placeholder="Paste updated ingredient list here…"></textarea>
+      </div>
+    </div>
+
+    <div class="profile-summary">
+      <span class="profile-summary-label">Checking for:</span>
+      {% if profile.allergens %}
+        {% for a in profile.allergens %}
+          <span class="chip chip-sm">{{ a }}</span>
+        {% endfor %}
+        <a href="{{ url_for('profile') }}" class="link-small">Edit</a>
+      {% else %}
+        <span class="text-muted">None — <a href="{{ url_for('profile') }}">add allergens</a></span>
+      {% endif %}
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" id="compareBtn" {% if not profile.allergens %}disabled{% endif %}>
+        🔄 Compare Labels
+      </button>
+      <button class="btn btn-ghost" id="clearCompare">Clear</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="card mt-4 hidden" id="compareResults">
+    <h2 class="results-title">Comparison Results</h2>
+
+    <!-- Allergen delta -->
+    <div id="allergenDelta" class="hidden mb-4">
+      <div id="newAllergens" class="hidden">
+        <div class="result-danger mb-3">
+          <h3>🚨 New Allergens in Updated Label</h3>
+          <div id="newAllergenList" class="allergen-results-list"></div>
+        </div>
+      </div>
+      <div id="removedAllergens" class="hidden">
+        <div class="result-success mb-3">
+          <h3>✅ Allergens Removed in Updated Label</h3>
+          <div id="removedAllergenList" class="allergen-results-list"></div>
+        </div>
+      </div>
+      <div id="unchangedAllergens" class="hidden">
+        <div class="result-info mb-3">
+          <h3>ℹ️ Allergens Present in Both Labels</h3>
+          <div id="unchangedAllergenList" class="allergen-results-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side by side diff -->
+    <div class="diff-section">
+      <h3>Ingredient Differences</h3>
+      <div class="diff-legend">
+        <span class="diff-tag diff-added-tag">Added</span>
+        <span class="diff-tag diff-removed-tag">Removed</span>
+        <span class="diff-tag diff-equal-tag">Unchanged</span>
+      </div>
+      <div class="diff-output" id="diffOutput"></div>
+    </div>
+
+    <div class="result-disclaimer" id="compareDisclaimer"></div>
+  </div>
+</div>
+
+<script>
+  const PROFILE_ALLERGENS = {{ profile.allergens | tojson }};
+</script>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+{% endblock %}

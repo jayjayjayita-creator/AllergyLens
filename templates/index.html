@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}AllergyLens – Food Allergy Ingredient Checker{% endblock %}
+{% block content %}
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Free &amp; Open Source</div>
+    <h1 class="hero-title">Know What's in Your Food</h1>
+    <p class="hero-subtitle">
+      AllergyLens scans food ingredient labels using OCR and checks them against
+      your personal allergy profile — helping you spot hidden allergens before they become a problem.
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('scan') }}" class="btn btn-primary btn-lg">
+        📷 Scan a Label
+      </a>
+      <a href="{{ url_for('profile') }}" class="btn btn-outline btn-lg">
+        ⚙️ Set Up Profile
+      </a>
+    </div>
+    {% if profile.allergens %}
+      <p class="hero-profile-note">
+        Active profile: <strong>{{ profile.name }}</strong> —
+        watching for <strong>{{ profile.allergens | join(', ') }}</strong>
+      </p>
+    {% else %}
+      <p class="hero-profile-note">
+        No allergens configured yet.
+        <a href="{{ url_for('profile') }}">Set up your profile →</a>
+      </p>
+    {% endif %}
+  </div>
+  <div class="hero-illustration" aria-hidden="true">
+    <div class="hero-card-mock">
+      <div class="mock-label">INGREDIENTS</div>
+      <div class="mock-text">
+        <span class="mock-highlight">Wheat flour</span>, sugar, cocoa butter,
+        <span class="mock-highlight">milk solids</span>, soy lecithin,
+        vanilla, <span class="mock-highlight">peanut oil</span>
+      </div>
+      <div class="mock-badge">⚠️ 3 allergens detected</div>
+    </div>
+  </div>
+</section>
+
+<section class="features-section">
+  <div class="section-container">
+    <h2 class="section-title">How It Works</h2>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-icon">1</div>
+        <h3>Set Your Profile</h3>
+        <p>Choose which of the 9 major allergens you need to avoid. Your profile is saved locally.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">2</div>
+        <h3>Upload or Type</h3>
+        <p>Upload a photo of the ingredient label or paste the text directly. OCR extracts text automatically.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">3</div>
+        <h3>Review Results</h3>
+        <p>See exactly which ingredients triggered a match, with the original text shown for context.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon">4</div>
+        <h3>Compare Labels</h3>
+        <p>Compare two ingredient lists to spot what changed — great for reformulated products.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="allergens-section">
+  <div class="section-container">
+    <h2 class="section-title">Supported Allergens</h2>
+    <p class="section-subtitle">
+      We check for all 9 major allergens recognized by the FDA, including synonyms, derivatives and hidden names.
+    </p>
+    <div class="allergen-chips">
+      <span class="chip chip-milk">🥛 Milk &amp; Dairy</span>
+      <span class="chip chip-peanut">🥜 Peanuts</span>
+      <span class="chip chip-treenut">🌰 Tree Nuts</span>
+      <span class="chip chip-egg">🥚 Eggs</span>
+      <span class="chip chip-soy">🫘 Soy</span>
+      <span class="chip chip-wheat">🌾 Wheat / Gluten</span>
+      <span class="chip chip-fish">🐟 Fish</span>
+      <span class="chip chip-shellfish">🦐 Shellfish</span>
+      <span class="chip chip-sesame">🫙 Sesame</span>
+    </div>
+    <div class="info-box info-box-blue">
+      <strong>Coverage includes hidden names:</strong> casein &amp; whey (milk), arachis oil (peanuts),
+      albumin (eggs), tahini (sesame), surimi (fish), worcestershire sauce (fish), and many more.
+    </div>
+  </div>
+</section>
+
+<section class="limits-section">
+  <div class="section-container">
+    <h2 class="section-title">Important Limitations</h2>
+    <div class="limits-grid">
+      <div class="limit-card limit-warning">
+        <h3>⚠️ OCR Accuracy</h3>
+        <p>Poor lighting, blurry photos or unusual fonts can cause OCR errors. Always verify extracted text against the physical label.</p>
+      </div>
+      <div class="limit-card limit-warning">
+        <h3>⚠️ Cross-Contact</h3>
+        <p>This tool cannot detect "may contain" warnings or manufacturing cross-contact. Those risks are not in ingredient lists.</p>
+      </div>
+      <div class="limit-card limit-danger">
+        <h3>🚫 Not Medical Advice</h3>
+        <p>A clean scan result does <strong>not</strong> mean a food is safe. Consult your allergist or healthcare provider for medical guidance.</p>
+      </div>
+      <div class="limit-card limit-info">
+        <h3>ℹ️ Dictionary Coverage</h3>
+        <p>Our allergen dictionary is comprehensive but not exhaustive. Novel product names or brand-specific terms may be missed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

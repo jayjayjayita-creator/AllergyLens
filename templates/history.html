@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Scan History – AllergyLens{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="section-container history-page-header">
+    <div>
+      <h1>Scan History</h1>
+      <p>{{ total }} scan{{ 's' if total != 1 else '' }} recorded</p>
+    </div>
+    {% if total > 0 %}
+    <form method="POST" action="{{ url_for('delete_all_scans') }}"
+          onsubmit="return confirm('Delete all scan history? This cannot be undone.');">
+      <button type="submit" class="btn btn-danger">🗑 Delete All</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="section-container">
+  {% if scans %}
+  <div class="history-list">
+    {% for scan in scans %}
+    <div class="history-card card">
+      <div class="history-card-header">
+        <div class="history-meta">
+          <span class="history-date">{{ scan.created_at[:19].replace('T', ' ') }} UTC</span>
+          <span class="badge badge-{{ scan.scan_type }}">{{ scan.scan_type | title }}</span>
+          {% if scan.ocr_confidence %}
+            <span class="badge badge-confidence-{{ scan.ocr_confidence }}">
+              OCR: {{ scan.ocr_confidence }}
+            </span>
+          {% endif %}
+        </div>
+        <form method="POST" action="{{ url_for('delete_scan', scan_id=scan.id) }}"
+              onsubmit="return confirm('Delete this scan record?');">
+          <button type="submit" class="btn-icon-delete" title="Delete scan" aria-label="Delete scan">🗑</button>
+        </form>
+      </div>
+
+      {% if scan.allergens_found %}
+        <div class="history-allergens">
+          <span class="history-label">⚠️ Allergens detected:</span>
+          {% for allergen, terms in scan.allergens_found.items() %}
+            <span class="chip chip-danger">{{ allergen }}</span>
+          {% endfor %}
+        </div>
+        <details class="history-details">
+          <summary>View matched terms</summary>
+          <ul class="matched-terms-list">
+            {% for allergen, terms in scan.allergens_found.items() %}
+              <li><strong>{{ allergen }}</strong>: {{ terms | join(', ') }}</li>
+            {% endfor %}
+          </ul>
+        </details>
+      {% else %}
+        <div class="history-allergens">
+          <span class="history-label text-success">✅ No allergens detected</span>
+        </div>
+      {% endif %}
+
+      {% if scan.notes %}
+        <div class="history-notes">
+          <span class="history-label">Note:</span> {{ scan.notes }}
+        </div>
+      {% endif %}
+
+      <details class="history-details">
+        <summary>View ingredient text</summary>
+        <pre class="ingredient-pre">{{ scan.ingredients_text }}</pre>
+      </details>
+
+      <div class="history-profile">Profile: {{ scan.profile_used }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if total_pages > 1 %}
+  <div class="pagination">
+    {% if page > 1 %}
+      <a href="{{ url_for('history', page=page-1) }}" class="btn btn-ghost btn-sm">← Previous</a>
+    {% endif %}
+    <span class="page-info">Page {{ page }} of {{ total_pages }}</span>
+    {% if page < total_pages %}
+      <a href="{{ url_for('history', page=page+1) }}" class="btn btn-ghost btn-sm">Next →</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="empty-state card">
+    <div class="empty-icon">📋</div>
+    <h2>No scans yet</h2>
+    <p>Your scan history will appear here after you check some ingredient labels.</p>
+    <a href="{{ url_for('scan') }}" class="btn btn-primary">Start Scanning</a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Server Error – AllergyLens{% endblock %}
+{% block content %}
+<div class="section-container" style="text-align:center; padding: 4rem 1rem;">
+  <div style="font-size: 4rem;">⚠️</div>
+  <h1>500 – Server Error</h1>
+  <p>Something went wrong on our end. Please try again.</p>
+  <a href="{{ url_for('index') }}" class="btn btn-primary">Go Home</a>
+</div>
+{% endblock %}
